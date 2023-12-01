@@ -1,0 +1,185 @@
+openapi: 3.0.0
+info:
+  title: Система проведения стажировок
+  version: 1.0.0
+tags:
+  - name: Заявка на стажировку
+    description: API Работы с формой на стажировку
+paths:
+   /specialties:
+    get:
+      tags:
+        - Заявка на стажировку
+      summary: Отображение в форме актуальных стажировок на данный момент
+      operationId: getRandomTask2
+      parameters:
+        - name: isActive
+          in: query
+          required: true
+          description: Статус направлений стажировок
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          description: Заявка стажера
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Specialties'
+        '400':
+          description: Неправильно введены данные
+   /specialties/task/{id}:
+     get:
+      tags:
+        - Заявка на стажировку
+      summary: Получение случайной тестовой задачи для выполнения
+      operationId: getRandomTask
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Идентификатор направления, по которому будет выдана тестовая задача
+          schema:
+            type: string
+            default: 1
+      responses:
+        '200':
+          description: Заявка стажера
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+        '400':
+          description: Неправильно введены данные
+    
+   /intern/form:
+    post:
+      tags:
+        - Заявка на стажировку
+      summary: Подача заявки на стажировку кандидатом
+      operationId: createForm
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Form'
+      responses:
+        '200':
+          description: Заявка успешно отправлена
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: Идентификатор стажера
+                    
+        '400':
+          description: Неверный запрос
+        '500':
+          description: Внутренняя ошибка сервера
+    
+components:
+  securitySchemes:
+    Authorization:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Form:
+      type: object
+      required:
+        - traineeshipId
+        - type
+        - firstName
+        - lastName
+        - middleName
+        - address
+        - birthday
+        - phoneNumber
+        - e-mail
+        - city
+      properties:
+        traineeshipId:
+          type: integer
+          description: Идентификатор стажировки
+        type:
+          type: string
+          description: Поле для СБ
+        firstName:
+          type: string
+          description: Имя поступающего на стажировку
+        lastName:
+          type: string
+          description: Фамилия поступающего на стажировку
+        middleName:
+          type: string
+          description: Отчество поступающего на стажировку
+        address:
+          type: string
+          description: Адрес проживания кандидата
+        birthday:
+          type: string
+          format: date
+        phoneNumber:
+          type: string
+          description: Номер телефона поступающего
+        e-mail:
+          type: string
+          description: Адрес почты, через которую будет вестись переписка до регистрации
+        city:
+          type: string
+          description: Город проживания кандидата
+        approvedByAdmin:
+          type: boolean
+          description: Статус проверки администратором
+          example: null
+        approvedBySecurity:
+          type: boolean
+          description: Статус проверки СБ
+          example: null
+        approvedBySupervisor:
+          type: boolean
+          description: Статус проверки руководителем стажировки
+          example: null
+    Task:
+      type: object
+      required:
+        - taskId
+        - title
+        - description
+      properties:
+        taskId:
+          type: integer
+          description: Идентификатор задачи
+        title:
+          type: string
+          description: Название задачи
+        description:
+          type: string
+          description: Описание задачи
+    Specialties:
+      type: object
+      required:
+      - id
+      - title
+      - isActive
+      properties:
+        id:
+          type: integer
+          description: Идентификатор направления
+        title:
+          type: string
+          description: Название направления
+        isActive:
+          type: boolean
+          description: Статус направления(Активно или нет)
+    
+    
