@@ -137,6 +137,9 @@ components:
         city:
           type: string
           description: Город проживания кандидата
+        firstSolutionTask:
+          type: string
+          description: Решение тестовой задачи стажером
         approvedByAdmin:
           type: boolean
           description: Статус проверки администратором
