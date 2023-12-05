@@ -1,0 +1,551 @@
+openapi: 3.0.0
+info:
+  title: Система проведения стажировок
+  version: 1.0.0
+tags:
+  - name: Заявка на стажировку
+    description: API Работы с формой на стажировку
+  - name: Административная панель
+    description: API методов интерфейса админки
+paths:
+   /specialties/:
+    get:
+      tags:
+        - Заявка на стажировку
+      summary: Отображение в форме актуальных стажировок на данный момент
+      operationId: getRandomTask2
+      parameters:
+        - name: isActive
+          in: query
+          required: true
+          description: Статус направлений стажировок
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          description: Заявка стажера
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Specialties'
+        '400':
+          description: Неправильно введены данные
+   /specialties/task{id}:
+     get:
+      tags:
+        - Заявка на стажировку
+      summary: Получение случайной тестовой задачи для выполнения
+      operationId: getRandomTask
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Идентификатор стажера, который получит задачу 
+          schema:
+            type: string
+            default: 1
+      responses:
+        '200':
+          description: Заявка стажера
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+        '400':
+          description: Неправильно введены данные
+    
+   /intern/form:
+    post:
+      tags:
+        - Заявка на стажировку
+      summary: Подача заявки на стажировку кандидатом
+      operationId: createForm
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Form'
+      responses:
+        '200':
+          description: Заявка успешно отправлена
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: Идентификатор стажера
+                  form:
+                    $ref: '#/components/schemas/Form'
+        '400':
+          description: Неверный запрос
+        '500':
+          description: Внутренняя ошибка сервера
+   
+   /intern/form/getForms:
+    get:
+      tags:
+        - Административная панель
+      summary: Получение заявок сотрудниками
+      operationId: getForms
+      parameters:
+        - name: id
+          in: query
+          required: false
+          description: Фильтрация заявок по идентификатору
+          schema:
+            type: integer
+            default: 1
+        - name: firstName
+          in: query
+          required: false
+          description: Фильтрация заявок по имени
+          schema:
+            type: string
+            default: Иван
+      security:
+        - Authorization: []
+      responses:
+        '200':
+          description: Заявка стажера
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Form'
+        '400':
+          description: Неправильный запрос
+        '401':
+          description: Отказано в доступе
+    
+   /internForm/admin-aproove{id}:
+     patch:
+      tags:
+        - Административная панель
+      summary: Проверка администратором на корректность формы
+      operationId: adminCheck
+      security:
+        - Authorization: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Идентификатор стажера
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Id_check'
+      responses:
+        '200':
+          description: Статус стажера изменен успешно
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Admin_Check_result'
+        '400':
+          description: Неверный запрос
+        '401':
+          description: Неавторизован
+        '404':
+          description: Стажер не найден
+        '500':
+          description: Внутренняя ошибка сервера    
+   
+   /internForm/security_aproove{id}:
+     patch:
+      tags:
+        - Административная панель
+      summary: Проверка службой безопасности
+      operationId: security_form_check
+      security:
+        - Authorization: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Идентификатор стажера
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Id_check'
+      responses:
+        '200':
+          description: Статус стажера изменен успешно
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Security_check_result'
+        '400':
+          description: Неверный запрос
+        '401':
+          description: Неавторизован
+        '404':
+          description: Стажер не найден
+        '500':
+          description: Внутренняя ошибка сервера
+   
+   /internForm/set-supervisor{id}:
+     patch:
+      tags:
+        - Административная панель
+      summary: Назначение руководителя стажировки на кандидата
+      operationId: setSupervisor
+      security:
+        - Authorization: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Идентификатор стажера
+          schema:
+           type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Id_check'
+      responses:
+        '200':
+          description: Руководитель стажировки назначен успешно
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Set_supervisor'
+        '400':
+          description: Неверный запрос
+        '401':
+          description: Неавторизован
+        '404':
+          description: Стажер не найден
+        '500':
+          description: Внутренняя ошибка сервера
+   /internForm/set-mentor{id}:
+     patch:
+      tags:
+        - Административная панель
+      summary: Назначение ментора на кандидата
+      operationId: setMentor
+      security:
+        - Authorization: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Идентификатор стажера
+          schema:
+           type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Id_check'
+      responses:
+        '200':
+          description: Ментор назначен успешно
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Set_mentor'
+        '400':
+          description: Неверный запрос
+        '401':
+          description: Неавторизован
+        '404':
+          description: Стажер не найден
+        '500':
+          description: Внутренняя ошибка сервера
+   /internForm/supervisor_aproove{id}:
+     patch:
+      tags:
+        - Административная панель
+      summary: Принятие решение о приеме кандидата на стажировку
+      operationId: supervisorFormCheck
+      security:
+        - Authorization: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Идентификатор стажера
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Id_check'
+      responses:
+        '200':
+          description: Статус стажера изменен успешно
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Supervisor_check_result'
+        '400':
+          description: Неверный запрос
+        '401':
+          description: Неавторизован
+        '404':
+          description: Стажер не найден
+        '500':
+          description: Внутренняя ошибка сервера      
+   
+   /internForm/accept{id}:
+     patch:
+      tags:
+        - Административная панель
+      summary: Принятие решения о трудоустройстве стажера
+      operationId: supervisorAccept
+      security:
+        - Authorization: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Идентификатор стажера
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Id_check'
+      responses:
+        '200':
+          description: Стажер принят успешно
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Accept'
+        '400':
+          description: Неверный запрос
+        '401':
+          description: Неавторизован
+        '404':
+          description: Стажер не найден
+        '500':
+          description: Внутренняя ошибка сервера        
+components:
+  securitySchemes:
+    Authorization:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Form:
+      type: object
+      required:
+        - traineeship_id
+        - type
+        - first_name
+        - last_name
+        - middle_name
+        - address
+        - birthday
+        - phone_number
+        - e-mail
+        - city
+      properties:
+        traineeship_id:
+          type: integer
+          description: Идентификатор стажировки
+        type:
+          type: string
+          description: Поле для СБ
+        first_name:
+          type: string
+          description: Имя поступающего на стажировку
+        last_name:
+          type: string
+          description: Фамилия поступающего на стажировку
+        middle_name:
+          type: string
+          description: Отчество поступающего на стажировку
+        address:
+          type: string
+          description: Адрес проживания кандидата
+        birthday:
+          type: string
+          format: date
+        phone_number:
+          type: string
+          description: Номер телефона поступающего
+        e-mail:
+          type: string
+          description: Адрес почты, через которую будет вестись переписка до регистрации
+        city:
+          type: string
+          description: Город проживания кандидата
+        firstSolutionTask:
+          type: string
+          description: Решение тестовой задачи стажером
+        approved_by_admin:
+          type: boolean
+          description: Статус проверки администратором
+          example: null
+        approved_by_security:
+          type: boolean
+          description: Статус проверки СБ
+          example: null
+        approved_by_supervisor:
+          type: boolean
+          description: Статус проверки руководителем стажировки
+          example: null
+        liga_users_internship_supervisor_id:
+          type: integer
+          description: Идентификатор назначенного руководителя стажировки
+        liga_users_internship_mentor_id:
+          type: integer
+          description: Идентификатор назначенного ментора
+        final_accept:
+          type: boolean
+          description: Принят ли стажер на сотрудничество в компании 
+          example: null
+    Task:
+      type: object
+      required:
+        - task_id
+        - title
+        - description
+      properties:
+        task_id:
+          type: integer
+          description: Идентификатор задачи
+        title:
+          type: string
+          description: Название задачи
+        description:
+          type: string
+          description: Описание задачи
+    Specialties:
+      type: object
+      required:
+      - id
+      - title
+      - is_active
+      properties:
+        id:
+          type: integer
+          description: Идентификатор направления
+        title:
+          type: string
+          description: Название направления
+        is_active:
+          type: boolean
+          description: Статус направления(Активно или нет)
+    Id_check:
+      type: object
+      required:
+        - intern_id
+      properties:
+        intern_id:
+          type: integer
+          description: Идентификатор стажера
+    Admin_Check_result:
+      type: object
+      required:
+        - intern_id
+        - approved_by_admin
+      properties:
+         intern_id:
+          type: integer
+          description: Идентификатор стажера
+         approved_by_admin:
+           type: boolean
+           description: Статус проверки по стажеру администратором
+    Security_check_result:
+      type: object
+      required:
+        - intern_id
+        - approved_by_security
+      properties:
+         intern_id:
+          type: integer
+          description: Идентификатор стажера
+         approved_by_security:
+           type: boolean
+           description: Статус проверки по стажеру сотрудником СБ
+    Supervisor_check_result:
+      type: object
+      required:
+        - intern_id
+        - approved_by_supervisor
+      properties:
+         intern_id:
+          type: integer
+          description: Идентификатор стажера
+         approved_by_supervisor:
+           type: boolean
+           description: Статус проверки по стажеру руководителем стажировки   
+    Set_supervisor:
+      type: object
+      required:
+        - intern_id
+        - liga_users_internship_supervisor_id
+      properties:
+        intern_id:
+          type: integer
+          description: Идентификатор стажера
+        liga_users_intenship_supervisor_id:
+          type: integer
+          description: Идентификатор руководителя стажировки
+    Set_mentor:
+      type: object
+      required:
+        - intern_id
+        - liga_users_internship_supervisor_id
+      properties:
+        intern_id:
+          type: integer
+          description: Идентификатор стажера
+        liga_users_internship_mentor_id:
+          type: integer
+          description: Идентификатор ментора стажировки   
+    Accept:
+      type: object
+      required:
+        - intern_id
+        - final_accept
+      properties:
+        intern_id:
+          type: integer
+          description: Идентификатор стажера
+        final_accept:
+          type: boolean
+          description: Принят ли стажер на сотрудничество в компании  
+    
+    
+    
+    
