@@ -198,7 +198,7 @@ paths:
         '400':
           description: Неверный запрос
         '401':
-          description: Неавторизован
+          description: Не авторизован
         '404':
           description: Стажер не найден
         '500':
@@ -237,7 +237,7 @@ paths:
         '400':
           description: Неверный запрос
         '401':
-          description: Неавторизован
+          description: Не авторизован
         '404':
           description: Стажер не найден
         '500':
@@ -275,7 +275,7 @@ paths:
         '400':
           description: Неверный запрос
         '401':
-          description: Неавторизован
+          description: Не авторизован
         '404':
           description: Стажер не найден
         '500':
@@ -284,7 +284,7 @@ paths:
      patch:
       tags:
         - Административная панель
-      summary: Принятие решение о приеме кандидата на стажировку
+      summary: Принятие решения о приеме кандидата на стажировку
       operationId: supervisorFormCheck
       security:
         - Authorization: []
@@ -313,7 +313,7 @@ paths:
         '400':
           description: Неверный запрос
         '401':
-          description: Неавторизован
+          description: Не авторизован
         '404':
           description: Стажер не найден
         '500':
@@ -352,7 +352,7 @@ paths:
         '400':
           description: Неверный запрос
         '401':
-          description: Неавторизован
+          description: Не авторизован
         '404':
           description: Стажер не найден
         '500':
