@@ -198,13 +198,32 @@ paths:
         '400':
           description: Неверный запрос
         '401':
-          description: Не авторизован
+          description: Неавторизован
         '404':
           description: Стажер не найден
         '500':
           description: Внутренняя ошибка сервера
    
-   /internForm/set-supervisor{id}:
+   
+   /internForm/get-supervisor:
+     get:
+      tags:
+        - Административная панель
+      summary: Получение списка всех руководителей стажировки
+      operationId: getSupervisor
+      responses:
+        '200':
+          description: Подгружается список руководителей стажировки
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Liga_supervisors'
+        '400':
+          description: Неправильно введены данные
+          
+   /internForm/set-supervisor{id}/{supervisor_id}:
      patch:
       tags:
         - Административная панель
@@ -218,13 +237,20 @@ paths:
           required: true
           description: Идентификатор стажера
           schema:
-           type: string
+           type: integer
+        - name: supervisor_id
+          in: path
+          required: true
+          description: Идентификатор руководителя стажировки
+          schema:
+           type: integer
+        
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Id_check'
+              $ref: '#/components/schemas/Id_check_supervisor'
       responses:
         '200':
           description: Руководитель стажировки назначен успешно
@@ -237,12 +263,29 @@ paths:
         '400':
           description: Неверный запрос
         '401':
-          description: Не авторизован
+          description: Неавторизован
         '404':
           description: Стажер не найден
         '500':
           description: Внутренняя ошибка сервера
-   /internForm/set-mentor{id}:
+   /internForm/get-mentor:
+     get:
+      tags:
+        - Административная панель
+      summary: Получение списка всех руководителей стажировки
+      operationId: getMentor
+      responses:
+        '200':
+          description: Подгружается список руководителей стажировки
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Liga_mentors'
+        '400':
+          description: Неправильно введены данные
+   /internForm/set-mentor{id}/{mentor_id}:
      patch:
       tags:
         - Административная панель
@@ -256,13 +299,19 @@ paths:
           required: true
           description: Идентификатор стажера
           schema:
-           type: string
+           type: integer
+        - name: mentor_id
+          in: path
+          required: true
+          description: Идентификатор руководителя стажировки
+          schema:
+           type: integer
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Id_check'
+              $ref: '#/components/schemas/Id_check_mentor'
       responses:
         '200':
           description: Ментор назначен успешно
@@ -275,7 +324,7 @@ paths:
         '400':
           description: Неверный запрос
         '401':
-          description: Не авторизован
+          description: Неавторизован
         '404':
           description: Стажер не найден
         '500':
@@ -284,7 +333,7 @@ paths:
      patch:
       tags:
         - Административная панель
-      summary: Принятие решения о приеме кандидата на стажировку
+      summary: Принятие решение о приеме кандидата на стажировку
       operationId: supervisorFormCheck
       security:
         - Authorization: []
@@ -313,7 +362,7 @@ paths:
         '400':
           description: Неверный запрос
         '401':
-          description: Не авторизован
+          description: Неавторизован
         '404':
           description: Стажер не найден
         '500':
@@ -352,7 +401,7 @@ paths:
         '400':
           description: Неверный запрос
         '401':
-          description: Не авторизован
+          description: Неавторизован
         '404':
           description: Стажер не найден
         '500':
@@ -465,14 +514,30 @@ components:
         is_active:
           type: boolean
           description: Статус направления(Активно или нет)
-    Id_check:
+    Id_check_mentor:
       type: object
       required:
         - intern_id
+        - mentor_id
       properties:
         intern_id:
           type: integer
           description: Идентификатор стажера
+        mentor_id:
+          type: integer
+          description: Идентификатор ментора
+    Id_check_supervisor:
+      type: object
+      required:
+        - intern_id
+        - supervisor_id
+      properties:
+        intern_id:
+          type: integer
+          description: Идентификатор стажера
+        supervisor_id:
+          type: integer
+          description: Идентификатор руководителя стажировки
     Admin_Check_result:
       type: object
       required:
@@ -485,6 +550,14 @@ components:
          approved_by_admin:
            type: boolean
            description: Статус проверки по стажеру администратором
+    Id_check:
+      type: object
+      required:
+        - intern_id
+      properties:
+        intern_id:
+          type: integer
+          description: Идентификатор стажера
     Security_check_result:
       type: object
       required:
@@ -545,6 +618,32 @@ components:
         final_accept:
           type: boolean
           description: Принят ли стажер на сотрудничество в компании  
+    Liga_supervisors:
+      type: object
+      required:
+        - supervisor_id
+        - fullname
+      properties:
+        supervisor_id:
+          type: integer
+          description: Идентификатор руководителя стажировки
+        fullname:
+          type: string
+          description: ФИО руководителей
+    Liga_mentors:
+      type: object
+      required:
+        - mentor_id
+        - fullname
+      properties:
+        supervisor_id:
+          type: integer
+          description: Идентификатор ментора
+        fullname:
+          type: string
+          description: ФИО менторов
+      
+    
     
     
     
