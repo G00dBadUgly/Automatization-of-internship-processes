@@ -636,7 +636,7 @@ components:
         - mentor_id
         - fullname
       properties:
-        supervisor_id:
+        mentor_id:
           type: integer
           description: Идентификатор ментора
         fullname:
