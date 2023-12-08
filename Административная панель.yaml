@@ -89,7 +89,7 @@ paths:
         '500':
           description: Внутренняя ошибка сервера
    
-   /intern/form/getForms:
+   /internForm/getForms:
     get:
       tags:
         - Административная панель
@@ -165,7 +165,7 @@ paths:
         '500':
           description: Внутренняя ошибка сервера    
    
-   /internForm/security_aproove{id}:
+   /internForm/security-aproove{id}:
      patch:
       tags:
         - Административная панель
@@ -268,7 +268,7 @@ paths:
           description: Стажер не найден
         '500':
           description: Внутренняя ошибка сервера
-   /internForm/get-mentor:
+   /internForm/getMentor:
      get:
       tags:
         - Административная панель
@@ -329,7 +329,7 @@ paths:
           description: Стажер не найден
         '500':
           description: Внутренняя ошибка сервера
-   /internForm/supervisor_aproove{id}:
+   /internForm/supervisor-aproove{id}:
      patch:
       tags:
         - Административная панель
@@ -636,7 +636,7 @@ components:
         - mentor_id
         - fullname
       properties:
-        mentor_id:
+        supervisor_id:
           type: integer
           description: Идентификатор ментора
         fullname:
