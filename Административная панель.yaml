@@ -272,11 +272,11 @@ paths:
      get:
       tags:
         - Административная панель
-      summary: Получение списка всех руководителей стажировки
+      summary: Получение списка всех менторов стажировки
       operationId: getMentor
       responses:
         '200':
-          description: Подгружается список руководителей стажировки
+          description: Подгружается список менторов стажировки
           content:
             application/json:
               schema:
