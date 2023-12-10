@@ -1,0 +1,1128 @@
+openapi: 3.0.0
+info:
+  title: Система проведения стажировок
+  version: 1.0.0
+tags:
+  - name: Заявка на стажировку
+    description: API Работы с формой на стажировку
+  - name: Административная панель
+    description: API методов интерфейса админки
+  - name: Интерфейс панели для прохождения стажировки
+    description: API методов интерфейса панели стажировки
+paths:
+   /specialties/:
+    get:
+      tags:
+        - Заявка на стажировку
+      summary: Отображение в форме актуальных стажировок на данный момент
+      operationId: getRandomTask2
+      parameters:
+        - name: isActive
+          in: query
+          required: true
+          description: Статус направлений стажировок
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          description: Заявка стажера
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Specialties'
+        '400':
+          description: Неправильно введены данные
+   /specialties/task/{id}:
+     get:
+      tags:
+        - Заявка на стажировку
+      summary: Получение случайной тестовой задачи для выполнения
+      operationId: getRandomTask
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Идентификатор стажера, который получит задачу 
+          schema:
+            type: integer
+            default: 1
+      responses:
+        '200':
+          description: Заявка стажера
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+        '400':
+          description: Неправильно введены данные
+    
+   /intern/form:
+    post:
+      tags:
+        - Заявка на стажировку
+      summary: Подача заявки на стажировку кандидатом
+      operationId: createForm
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Form'
+      responses:
+        '200':
+          description: Заявка успешно отправлена
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: Идентификатор стажера
+                  form:
+                    $ref: '#/components/schemas/Form'
+        '400':
+          description: Неверный запрос
+        '500':
+          description: Внутренняя ошибка сервера
+   
+   /internForm/getForms:
+    get:
+      tags:
+        - Административная панель
+      summary: Получение заявок сотрудниками
+      operationId: getForms
+      parameters:
+        - name: id
+          in: query
+          required: false
+          description: Фильтрация заявок по идентификатору
+          schema:
+            type: integer
+            default: 1
+        - name: firstName
+          in: query
+          required: false
+          description: Фильтрация заявок по имени
+          schema:
+            type: string
+            default: Иван
+      security:
+        - Authorization: []
+      responses:
+        '200':
+          description: Заявка стажера
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Form'
+        '400':
+          description: Неправильный запрос
+        '401':
+          description: Отказано в доступе
+    
+   /internForm/admin-aproove/{id}:
+     patch:
+      tags:
+        - Административная панель
+      summary: Проверка администратором на корректность формы
+      operationId: adminCheck
+      security:
+        - Authorization: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Идентификатор стажера
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Статус стажера изменен успешно
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Admin_Check_result'
+        '400':
+          description: Неверный запрос
+        '401':
+          description: Неавторизован
+        '404':
+          description: Стажер не найден
+        '500':
+          description: Внутренняя ошибка сервера    
+   
+   /internForm/security-aproove/{id}:
+     patch:
+      tags:
+        - Административная панель
+      summary: Проверка службой безопасности
+      operationId: security_form_check
+      security:
+        - Authorization: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Идентификатор стажера
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Статус стажера изменен успешно
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Security_check_result'
+        '400':
+          description: Неверный запрос
+        '401':
+          description: Неавторизован
+        '404':
+          description: Стажер не найден
+        '500':
+          description: Внутренняя ошибка сервера
+   
+   
+   /internForm/get-supervisor:
+     get:
+      tags:
+        - Административная панель
+      summary: Получение списка всех руководителей стажировки
+      operationId: getSupervisor
+      responses:
+        '200':
+          description: Подгружается список руководителей стажировки
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Liga_supervisors'
+        '400':
+          description: Неправильно введены данные
+          
+   /internForm/set-supervisor/{intern_id}:
+     patch:
+      tags:
+        - Административная панель
+      summary: Назначение руководителя стажировки на кандидата
+      operationId: setSupervisor
+      security:
+        - Authorization: []
+      parameters:
+        - name: intern_id
+          in: path
+          required: true
+          description: Идентификатор стажера
+          schema:
+           type: integer
+        
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Id_check_supervisor'
+      responses:
+        '200':
+          description: Руководитель стажировки назначен успешно
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Set_supervisor'
+        '400':
+          description: Неверный запрос
+        '401':
+          description: Неавторизован
+        '404':
+          description: Стажер не найден
+        '500':
+          description: Внутренняя ошибка сервера
+   /internForm/getMentor:
+     get:
+      tags:
+        - Административная панель
+      summary: Получение списка всех менторов стажировки
+      operationId: getMentor
+      responses:
+        '200':
+          description: Подгружается список менторов стажировки
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Liga_mentors'
+        '400':
+          description: Неправильно введены данные
+   /internForm/set-mentor/{intern_id}:
+     patch:
+      tags:
+        - Административная панель
+      summary: Назначение ментора на кандидата
+      operationId: setMentor
+      security:
+        - Authorization: []
+      parameters:
+        - name: intern_id
+          in: path
+          required: true
+          description: Идентификатор стажера
+          schema:
+           type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Id_check_mentor'
+      responses:
+        '200':
+          description: Ментор назначен успешно
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Set_mentor'
+        '400':
+          description: Неверный запрос
+        '401':
+          description: Неавторизован
+        '404':
+          description: Стажер не найден
+        '500':
+          description: Внутренняя ошибка сервера
+   /internForm/supervisor-aproove/{id}:
+     patch:
+      tags:
+        - Административная панель
+      summary: Принятие решение о приеме кандидата на стажировку
+      operationId: supervisorFormCheck
+      security:
+        - Authorization: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Идентификатор стажера
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Id_check'
+      responses:
+        '200':
+          description: Статус стажера изменен успешно
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Supervisor_check_result'
+        '400':
+          description: Неверный запрос
+        '401':
+          description: Неавторизован
+        '404':
+          description: Стажер не найден
+        '500':
+          description: Внутренняя ошибка сервера      
+   
+   /internForm/accept/{id}:
+     patch:
+      tags:
+        - Административная панель
+      summary: Принятие решения о трудоустройстве стажера
+      operationId: supervisorAccept
+      security:
+        - Authorization: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Идентификатор стажера
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Id_check'
+      responses:
+        '200':
+          description: Стажер принят успешно
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Accept'
+        '400':
+          description: Неверный запрос
+        '401':
+          description: Неавторизован
+        '404':
+          description: Стажер не найден
+        '500':
+          description: Внутренняя ошибка сервера 
+   
+   /internship/list-interns-by-id-mentor/{mentor_id}:
+     get:
+      tags:
+        - Интерфейс панели для прохождения стажировки
+      summary: Получение списка стажеров закрепленных за ментором
+      operationId: getInterns
+      security:
+        - Authorization: []
+      parameters:
+        - name: mentor_id
+          in: path
+          required: true
+          description: Идентификатор ментора
+          schema:
+            type: integer
+            default: 1
+      responses:
+        '200':
+          description: Список стажеров
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/interns'
+        '400':
+          description: Неправильно введены данные 
+   /internship/list-task-by-intern-id/{intern_id}:
+     get:
+      tags:
+        - Интерфейс панели для прохождения стажировки
+      summary: Получение списка заданий в зависимости от направления выбранного стажером
+      operationId: getTasks
+      security:
+        - Authorization: []
+      parameters:
+        - name: intern_id
+          in: path
+          required: true
+          description: Идентификатор Стажера
+          schema:
+            type: string
+            default: 1
+      responses:
+        '200':
+          description: Список заданий
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+        '400':
+          description: Неправильно введены данные     
+   /internship/create-new-homework:
+    post:
+      tags:
+        - Интерфейс панели для прохождения стажировки
+      summary: Создания домашнего задания ментором
+      operationId: createHomework
+      security:
+        - Authorization: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/setTask'
+      responses:
+        '200':
+          description: Задача успешно создана
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: Идентификатор назначенной задачи на стажера
+                
+        '400':
+          description: Неверный запрос
+        '500':
+          description: Внутренняя ошибка сервера
+   
+   /internship/list-tasks-by-intern-id/{task_id}:
+     patch:
+      tags:
+        - Интерфейс панели для прохождения стажировки
+      summary: Добавления решения к задаче
+      operationId: postTask
+      security:
+        - Authorization: []
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          description: Идентификатор задания
+          schema:
+           type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Id_check'
+      responses:
+        '200':
+          description: Задание добавлено успешно
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/postTask'
+        '400':
+          description: Неверный запрос
+        '401':
+          description: Неавторизован
+        '404':
+          description: Задание не найдено
+        '500':
+          description: Внутренняя ошибка сервера       
+   /internship/list-completed-tasks-by-intern-id/{intern_id}:
+     get:
+      tags:
+        - Интерфейс панели для прохождения стажировки
+      summary: Получение выполненных заданий стажером
+      operationId: getCompletedTasks
+      security:
+        - Authorization: []
+      parameters:
+        - name: intern_id
+          in: path
+          required: true
+          description: Идентификатор Стажера
+          schema:
+            type: integer
+            default: 1
+      responses:
+        '200':
+          description: Список выполненных заданий
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/completedTask'
+        '400':
+          description: Неправильно введены данные  
+   /internship/list-completed-tasks-by-intern-id/{task_id}:
+     patch:
+      tags:
+        - Интерфейс панели для прохождения стажировки
+      summary: Проверка решения ментором
+      operationId: taskCheck
+      security:
+        - Authorization: []
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          description: Идентификатор задания
+          schema:
+           type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Id_check'
+      responses:
+        '200':
+          description: Задание добавлено успешно
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/checkTask'
+        '400':
+          description: Неверный запрос
+        '401':
+          description: Неавторизован
+        '404':
+          description: Задание не найдено
+        '500':
+          description: Внутренняя ошибка сервера          
+   
+   /internship/get-topics-by-mentor-id/{mentor_id}:
+     get:
+      tags:
+        - Интерфейс панели для прохождения стажировки
+      summary: Выпадающий список тем в зависимости от выбранного направления стажировки
+      operationId: getSchedule
+      security:
+        - Authorization: []
+      parameters:
+        - name: mentor_id
+          in: path
+          required: true
+          description: Идентификатор ментора
+          schema:
+            type: integer
+            default: 1
+      responses:
+        '200':
+          description: Темы лекций получены успешно
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/mentorTopics'
+        '400':
+          description: Неправильно введены данные 
+          
+   /internship/create-new-schedule:
+    post:
+      tags:
+        - Интерфейс панели для прохождения стажировки
+      summary: Добавление лекции в расписание
+      operationId: createLecture
+      security:
+        - Authorization: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/mentorLectures'
+      responses:
+        '200':
+          description: Лекция успешно добавлена
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  schedule_id:
+                    type: integer
+                    description: Идентификатор созданной лекции в расписании
+                
+        '400':
+          description: Неверный запрос
+        '500':
+          description: Внутренняя ошибка сервера
+   
+   /internship/edit-schedule/{schedule_id}:
+     patch:
+      tags:
+        - Интерфейс панели для прохождения стажировки
+      summary: Изменения расписания
+      operationId: EditSchedule
+      security:
+        - Authorization: []
+      parameters:
+        - name: schedule_id
+          in: path
+          required: true
+          description: Идентификатор расписания
+          schema:
+           type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Id_check_mentor'
+      responses:
+        '200':
+          description: Расписание добавлено успешно
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/mentorSchedule'
+        '400':
+          description: Неверный запрос
+        '401':
+          description: Неавторизован
+        '404':
+          description: Расписание не найдено
+        '500':
+          description: Внутренняя ошибка сервера          
+   /internship/delete-schedule/{schedule_id}:
+     delete:
+      tags:
+        - Интерфейс панели для прохождения стажировки
+      summary: Удаление расписания
+      operationId: DeleteSchedule
+      security:
+        - Authorization: []
+      parameters:
+        - name: schedule_id
+          in: path
+          required: true
+          description: Идентификатор расписания
+          schema:
+           type: integer
+      responses:
+        '200':
+          description: Расписание удалено успешно
+        '400':
+          description: Неверный запрос
+        '401':
+          description: Неавторизован
+        '404':
+          description: Расписание не найдено
+        '500':
+          description: Внутренняя ошибка сервера        
+   
+   /internship/get-lectures-by-speciality-id/{specialty_id}:
+     get:
+      tags:
+        - Интерфейс панели для прохождения стажировки
+      summary: Список всех  лекций в зависимости от направления
+      operationId: getLectures
+      security:
+        - Authorization: []
+      parameters:
+        - name: specialty_id
+          in: path
+          required: true
+          description: Идентификатор направления
+          schema:
+            type: integer
+            default: 1
+      responses:
+        '200':
+          description: Лекции получены успешно
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/getLectures'
+        '400':
+          description: Неправильно введены данные       
+          
+components:
+  securitySchemes:
+    Authorization:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Form:
+      type: object
+      required:
+        - traineeship_id
+        - type
+        - first_name
+        - last_name
+        - middle_name
+        - address
+        - birthday
+        - phone_number
+        - e-mail
+        - city
+      properties:
+        traineeship_id:
+          type: integer
+          description: Идентификатор стажировки
+        type:
+          type: string
+          description: Поле для СБ
+        first_name:
+          type: string
+          description: Имя поступающего на стажировку
+        last_name:
+          type: string
+          description: Фамилия поступающего на стажировку
+        middle_name:
+          type: string
+          description: Отчество поступающего на стажировку
+        address:
+          type: string
+          description: Адрес проживания кандидата
+        birthday:
+          type: string
+          format: date
+        phone_number:
+          type: string
+          description: Номер телефона поступающего
+        e-mail:
+          type: string
+          description: Адрес почты, через которую будет вестись переписка до регистрации
+        city:
+          type: string
+          description: Город проживания кандидата
+        firstSolutionTask:
+          type: string
+          description: Решение тестовой задачи стажером
+        approved_by_admin:
+          type: boolean
+          description: Статус проверки администратором
+          example: null
+        approved_by_security:
+          type: boolean
+          description: Статус проверки СБ
+          example: null
+        approved_by_supervisor:
+          type: boolean
+          description: Статус проверки руководителем стажировки
+          example: null
+        liga_users_internship_supervisor_id:
+          type: integer
+          description: Идентификатор назначенного руководителя стажировки
+        liga_users_internship_mentor_id:
+          type: integer
+          description: Идентификатор назначенного ментора
+        final_accept:
+          type: boolean
+          description: Принят ли стажер на сотрудничество в компании 
+          example: null
+    Task:
+      type: object
+      required:
+        - task_id
+        - title
+        - description
+      properties:
+        task_id:
+          type: integer
+          description: Идентификатор задачи
+        title:
+          type: string
+          description: Название задачи
+        description:
+          type: string
+          description: Описание задачи
+    Specialties:
+      type: object
+      required:
+      - id
+      - title
+      - is_active
+      properties:
+        id:
+          type: integer
+          description: Идентификатор направления
+        title:
+          type: string
+          description: Название направления
+        is_active:
+          type: boolean
+          description: Статус направления(Активно или нет)
+    Id_check_mentor:
+      type: object
+      required:
+        - mentor_id
+      properties:
+        mentor_id:
+          type: integer
+          description: Идентификатор ментора
+    Id_check_supervisor:
+      type: object
+      required:
+        - supervisor_id
+      properties:
+        supervisor_id:
+          type: integer
+          description: Идентификатор руководителя стажировки
+    Admin_Check_result:
+      type: object
+      required:
+        - intern_id
+        - approved_by_admin
+      properties:
+         intern_id:
+          type: integer
+          description: Идентификатор стажера
+         approved_by_admin:
+           type: boolean
+           description: Статус проверки по стажеру администратором
+    Id_check:
+      type: object
+      required:
+        - intern_id
+      properties:
+        intern_id:
+          type: integer
+          description: Идентификатор стажера
+    Security_check_result:
+      type: object
+      required:
+        - intern_id
+        - approved_by_security
+      properties:
+         intern_id:
+          type: integer
+          description: Идентификатор стажера
+         approved_by_security:
+           type: boolean
+           description: Статус проверки по стажеру сотрудником СБ
+    Supervisor_check_result:
+      type: object
+      required:
+        - intern_id
+        - approved_by_supervisor
+      properties:
+         intern_id:
+          type: integer
+          description: Идентификатор стажера
+         approved_by_supervisor:
+           type: boolean
+           description: Статус проверки по стажеру руководителем стажировки   
+    Set_supervisor:
+      type: object
+      required:
+        - intern_id
+        - liga_users_internship_supervisor_id
+      properties:
+        intern_id:
+          type: integer
+          description: Идентификатор стажера
+        liga_users_intenship_supervisor_id:
+          type: integer
+          description: Идентификатор руководителя стажировки
+    Set_mentor:
+      type: object
+      required:
+        - intern_id
+        - liga_users_internship_supervisor_id
+      properties:
+        intern_id:
+          type: integer
+          description: Идентификатор стажера
+        liga_users_internship_mentor_id:
+          type: integer
+          description: Идентификатор ментора стажировки   
+    Accept:
+      type: object
+      required:
+        - intern_id
+        - final_accept
+      properties:
+        intern_id:
+          type: integer
+          description: Идентификатор стажера
+        final_accept:
+          type: boolean
+          description: Принят ли стажер на сотрудничество в компании  
+    Liga_supervisors:
+      type: object
+      required:
+        - supervisor_id
+        - fullname
+      properties:
+        supervisor_id:
+          type: integer
+          description: Идентификатор руководителя стажировки
+        fullname:
+          type: string
+          description: ФИО руководителей
+    Liga_mentors:
+      type: object
+      required:
+        - mentor_id
+        - fullname
+      properties:
+        supervisor_id:
+          type: integer
+          description: Идентификатор ментора
+        fullname:
+          type: string
+          description: ФИО менторов
+    interns:
+      type: object
+      required:
+        - intern_id
+        - fullname
+      properties:
+        intern_id:
+          type: integer
+          description: Идентификатор стажера   
+        fullname:
+          type: string
+          description: ФИО стажера
+    setTask:
+      type: object
+      required:
+        - intern_id
+        - mentor_id
+        - task_id
+      properties:
+        intern_id:
+          type: integer
+          description: Идентификатор стажера
+        mentor_id:
+          type: integer
+          description: Идентификатор ментора
+        task_id:
+          type: integer
+          description: Идентификатор задачи
+    postTask:
+      type: object
+      required:
+        - task_id
+        - solution
+      properties:
+        task_id:
+          type: integer
+          description: Идентификатор стажера
+        solution:
+          type: string
+          description: Решение задачи
+    completedTask:
+      type: object
+      required:
+        - task_id
+        - title
+        - description
+      properties:
+        task_id:
+          type: integer
+          description: Идентификатор задачи
+        title:
+          type: string
+          description: Название задачи
+        description:
+          type: string
+          description: Описание задачи
+        solution:
+          type: string
+          description: Решение задачи стажером
+        taskHint:
+          type: string
+          description: Каким решение задачи должно быть 
+    checkTask:
+      type: object
+      required:
+        - task_id
+        - is_correct
+      properties:
+        task_id:
+          type: integer
+          description: Идентификатор стажера
+        mentor_commentary:
+          type: string
+          description: Комментарий ментора по решению задачи стажером
+        is_correct:
+          type: boolean
+          description: Правильно ли стажер выполнил задание или нет
+    mentorTopics:
+      type: object
+      required:
+        - schedule_id
+        - topic
+        - schedule_start_date_time
+        - schedule_end_date_time 
+      properties:
+        schedule_id:
+          type: integer
+          description: Идентификатор расписания
+        topic:
+          type: string
+          description: Тема лекции
+        schedule_start_date_time:
+          type: string
+          description: Дата и время начала лекции
+        schedule_end_date_time:
+          type: string
+          description: Дата и время конца лекции
+    mentorLectures:
+      type: object
+      required:
+        - mentor_id
+        - lecture_id
+        - schedule_start_date_time
+        - schedule_end_date_time 
+      properties:
+        mentor_id:
+          type: integer
+          description: Идентификатор ментора
+        lecture_id:
+          type: integer
+          description: Идентификатор лекции
+        schedule_start_date_time:
+          type: string
+          description: Дата и время начала лекции
+        schedule_end_date_time:
+          type: string
+          description: Дата и время конца лекции
+    mentorSchedule:    
+      type: object
+      required:
+        - schedule_id
+        - lecture_id
+        - schedule_start_date_time
+        - schedule_end_date_time 
+      properties:
+        schedule_id:
+          type: integer
+          description: Идентификатор расписания
+        lecture_id:
+          type: integer
+          description: Идентификатор лекции
+        schedule_start_date_time:
+          type: string
+          description: Дата и время начала лекции
+        schedule_end_date_time:
+          type: string
+          description: Дата и время конца лекции
+    getLectures:    
+      type: object
+      required:
+        - schedule_id
+        - topic
+        - description
+        - winrar_file
+        - schedule_start_date_time
+        - schedule_end_date_time 
+      properties:
+        schedule_id:
+          type: integer
+          description: Идентификатор расписания
+        topic:
+          type: string
+          description: Темы лекций
+        winrar_file:
+          type: string
+          format: binary
+          description: Материалы для лекций
+        schedule_start_date_time:
+          type: string
+          description: Дата и время начала лекции
+        schedule_end_date_time:
+          type: string
+          description: Дата и время конца лекции        
+          
+          
+        
+      
+    
+    
+    
+    
+    
